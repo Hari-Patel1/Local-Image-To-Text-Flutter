@@ -3,6 +3,8 @@ package com.example.image_text_reader
 import com.example.image_text_reader.ocr.SimpleOcrEngine
 import com.example.image_text_reader.models.ImageInput
 import com.example.image_text_reader.processing.ImageProcessor
+import com.example.image_text_reader.ml.OnnxEngine
+import com.example.image_text_reader.paddle.PaddleOcrEngine
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -20,11 +22,18 @@ class ImageTextReaderPlugin :
     // when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
 
+    private val onnxEngine =
+        OnnxEngine()
+
     private val ocrEngine =
-        SimpleOcrEngine()
+        PaddleOcrEngine(
+            onnxEngine
+        )
 
     private val imageProcessor =
         ImageProcessor()
+
+
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "image_text_reader")
@@ -72,10 +81,20 @@ class ImageTextReaderPlugin :
                     )
 
 
+                val onnxReady =
+                    onnxEngine.initialise()
+
+
                 val text =
-                    ocrEngine.extractText(
-                        image
-                    )
+                    if(onnxReady){
+
+                        "ONNX Runtime ready"
+
+                    } else {
+
+                        "ONNX Runtime failed"
+
+                    }
 
 
                 result.success(
