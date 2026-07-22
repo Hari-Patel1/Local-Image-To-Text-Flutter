@@ -1,19 +1,14 @@
 package com.example.image_text_reader.ml
 
-
 import android.graphics.Bitmap
-import java.nio.FloatBuffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-
 class ImageTensorConverter {
-
 
     fun convert(
         bitmap: Bitmap
     ): TensorImage {
-
 
         val resized =
             Bitmap.createScaledBitmap(
@@ -23,28 +18,23 @@ class ImageTensorConverter {
                 true
             )
 
-
-        val inputSize =
-            1 * 3 * 640 * 640
-
+        println(
+            "DETECTOR CONVERTER: ${resized.width} x ${resized.height}"
+        )
 
         val buffer =
             ByteBuffer
                 .allocateDirect(
-                    inputSize * 4
+                    1 * 3 * 640 * 640 * 4
                 )
-                .order(
-                    ByteOrder.nativeOrder()
-                )
+                .order(ByteOrder.nativeOrder())
                 .asFloatBuffer()
-
 
 
         val pixels =
             IntArray(
                 640 * 640
             )
-
 
         resized.getPixels(
             pixels,
@@ -57,35 +47,23 @@ class ImageTensorConverter {
         )
 
 
-
         for(pixel in pixels){
 
+            buffer.put(
+                ((pixel shr 16) and 0xFF) / 255f
+            )
 
-            val r =
-                ((pixel shr 16) and 0xFF) / 255.0f
+            buffer.put(
+                ((pixel shr 8) and 0xFF) / 255f
+            )
 
-
-            val g =
-                ((pixel shr 8) and 0xFF) / 255.0f
-
-
-            val b =
-                (pixel and 0xFF) / 255.0f
-
-
-
-            buffer.put(r)
-
-            buffer.put(g)
-
-            buffer.put(b)
-
+            buffer.put(
+                (pixel and 0xFF) / 255f
+            )
         }
 
 
-
         buffer.rewind()
-
 
 
         return TensorImage(
@@ -93,7 +71,5 @@ class ImageTensorConverter {
             640,
             640
         )
-
     }
-
 }

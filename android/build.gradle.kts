@@ -75,5 +75,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.0.0")
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.27.0")
+    implementation("org.opencv:opencv:4.10.0")
 
 }

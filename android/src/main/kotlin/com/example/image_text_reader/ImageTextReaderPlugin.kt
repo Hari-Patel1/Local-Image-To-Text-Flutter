@@ -63,6 +63,7 @@ class ImageTextReaderPlugin :
 
         ocrEngine =
             PaddleOcrEngine(
+                flutterPluginBinding.applicationContext,
                 onnxEngine
             )
 
@@ -115,6 +116,8 @@ class ImageTextReaderPlugin :
                         processedImage
                     )
 
+
+                println("SENDING RESULT TO FLUTTER")
 
                 result.success(
                     mapOf(

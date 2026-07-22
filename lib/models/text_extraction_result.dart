@@ -1,21 +1,23 @@
 class TextExtractionResult {
-  final String text;
 
+  final String text;
   final double confidence;
 
-  const TextExtractionResult({
+
+  TextExtractionResult({
     required this.text,
-    this.confidence = 1.0,
+    required this.confidence,
   });
 
+
   factory TextExtractionResult.fromMap(
-      Map<dynamic, dynamic> map,
+      Map<dynamic, dynamic> map
       ) {
+
     return TextExtractionResult(
-      text: map["text"] ?? "",
-      confidence:
-      (map["confidence"] as num?)?.toDouble() ??
-          1.0,
+      text: map['text'] ?? '',
+      confidence: (map['confidence'] ?? 0).toDouble(),
     );
+
   }
 }

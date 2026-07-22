@@ -1,6 +1,5 @@
 package com.example.image_text_reader.ml
 
-
 import ai.onnxruntime.*
 import android.content.Context
 import java.nio.FloatBuffer
@@ -25,9 +24,7 @@ class OnnxEngine(
         path: String
     ): Boolean {
 
-
         return try {
-
 
             val modelBytes =
                 context.assets
@@ -41,6 +38,16 @@ class OnnxEngine(
                 )
 
 
+            println(
+                "$name INPUT INFO: ${session.inputInfo}"
+            )
+
+
+            println(
+                "$name OUTPUT INFO: ${session.outputInfo}"
+            )
+
+
             sessions[name] =
                 session
 
@@ -50,6 +57,7 @@ class OnnxEngine(
 
         } catch(e: Exception) {
 
+            e.printStackTrace()
 
             false
 
@@ -72,25 +80,28 @@ class OnnxEngine(
     fun run(
         modelName: String,
         input: FloatBuffer,
-        width: Int,
-        height: Int
+        shape: LongArray
     ): OrtSession.Result {
 
 
         val session =
             sessions[modelName]
                 ?: throw Exception(
-                    "Model not loaded"
+                    "Model not loaded: $modelName"
                 )
 
+        println(
+            "MODEL $modelName INPUTS: ${session.inputInfo}"
+        )
 
-        val shape =
-            longArrayOf(
-                1,
-                3,
-                height.toLong(),
-                width.toLong()
-            )
+        println(
+            "MODEL $modelName OUTPUTS: ${session.outputInfo}"
+        )
+
+
+        println(
+            "ONNX SHAPE: ${shape.contentToString()}"
+        )
 
 
         val tensor =
@@ -103,8 +114,7 @@ class OnnxEngine(
 
         val inputs =
             mapOf(
-                session.inputNames.first()
-                        to tensor
+                session.inputNames.first() to tensor
             )
 
 

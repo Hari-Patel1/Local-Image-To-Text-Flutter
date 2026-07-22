@@ -20,16 +20,27 @@ class PaddleDetector(
 
 
     fun detect(
-        tensor: TensorImage
+        tensor: TensorImage,
+        originalWidth: Int,
+        originalHeight: Int
     ): List<TextBox> {
+
+
+        println(
+            "Detector tensor: width=${tensor.width}, height=${tensor.height}"
+        )
 
 
         val result =
             onnxEngine.run(
                 "detector",
                 tensor.buffer,
-                tensor.width,
-                tensor.height
+                longArrayOf(
+                    1,
+                    3,
+                    tensor.height.toLong(),
+                    tensor.width.toLong()
+                )
             )
 
 
@@ -52,6 +63,15 @@ class PaddleDetector(
 
 
 
+        /*
+         Detector output is:
+         [1,1,height,width]
+
+         We pass the probability map
+         into DB post processing.
+        */
+
+
         val boxes =
             postProcessor.process(
                 values,
@@ -64,7 +84,6 @@ class PaddleDetector(
         println(
             "Detected boxes: ${boxes.size}"
         )
-
 
 
         result.close()
