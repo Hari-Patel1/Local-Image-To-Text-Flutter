@@ -6,7 +6,6 @@ import com.example.image_text_reader.processing.ImageProcessor
 import com.example.image_text_reader.ml.OnnxEngine
 import com.example.image_text_reader.paddle.PaddleOcrEngine
 import com.example.image_text_reader.ml.ModelManager
-import com.example.image_text_reader.detector.PaddleDetector
 import ai.onnxruntime.OrtEnvironment
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -34,7 +33,6 @@ class ImageTextReaderPlugin :
 
     private lateinit var modelManager: ModelManager
 
-    private lateinit var detector: PaddleDetector
 
 
 
@@ -49,11 +47,7 @@ class ImageTextReaderPlugin :
                 flutterPluginBinding.applicationContext
             )
 
-        detector =
-            PaddleDetector(
-                onnxEngine,
-                OrtEnvironment.getEnvironment()
-            )
+
 
 
         onnxEngine.loadModel(
@@ -113,9 +107,7 @@ class ImageTextReaderPlugin :
                         image
                     )
 
-                detector.detect(
-                    processedImage
-                )
+
 
 
                 val ocrResult =

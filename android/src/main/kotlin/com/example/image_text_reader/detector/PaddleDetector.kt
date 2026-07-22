@@ -2,56 +2,30 @@ package com.example.image_text_reader.detector
 
 
 import com.example.image_text_reader.ml.OnnxEngine
-import com.example.image_text_reader.ml.TensorUtils
-import com.example.image_text_reader.processing.ProcessedImage
-import ai.onnxruntime.OrtEnvironment
-import android.util.Log
+import com.example.image_text_reader.ml.TensorImage
+
 
 
 class PaddleDetector(
-    private val onnxEngine: OnnxEngine,
-    private val environment: OrtEnvironment
+    private val onnxEngine: OnnxEngine
 ) {
-
-    private val decoder =
-        DetectionDecoder()
 
 
     fun detect(
-        image: ProcessedImage
+        tensor: TensorImage
     ) {
-
-
-        val tensor =
-            TensorUtils.bitmapToTensor(
-                environment,
-                image.bitmap,
-                640,
-                640
-            )
 
 
         val result =
             onnxEngine.run(
                 "detector",
-                tensor
+                tensor.buffer,
+                tensor.width,
+                tensor.height
             )
 
 
-        val output =
-            result[0].value as Array<Array<Array<FloatArray>>>
-
-
-        val boxes =
-            decoder.decode(
-                output
-            )
-
-
-        Log.d(
-            "PADDLE_DETECTOR",
-            "Detected boxes: ${boxes.size}"
-        )
+        result.close()
 
     }
 

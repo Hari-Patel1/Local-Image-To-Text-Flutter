@@ -4,6 +4,7 @@ package com.example.image_text_reader.paddle
 import com.example.image_text_reader.ml.OnnxEngine
 import com.example.image_text_reader.ml.ImageTensorConverter
 import com.example.image_text_reader.processing.ProcessedImage
+import com.example.image_text_reader.detector.PaddleDetector
 
 
 class PaddleOcrEngine(
@@ -13,6 +14,12 @@ class PaddleOcrEngine(
 
     private val tensorConverter =
         ImageTensorConverter()
+
+
+    private val detector =
+        PaddleDetector(
+            onnxEngine
+        )
 
 
 
@@ -27,8 +34,13 @@ class PaddleOcrEngine(
             )
 
 
+        detector.detect(
+            tensor
+        )
+
+
         return OcrResult(
-            text = "OCR tensor created",
+            text = "Detection completed",
             confidence = 1.0f
         )
 

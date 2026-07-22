@@ -1,11 +1,9 @@
 package com.example.image_text_reader.ml
 
 
-import ai.onnxruntime.OrtEnvironment
-import ai.onnxruntime.OrtSession
+import ai.onnxruntime.*
 import android.content.Context
-
-import ai.onnxruntime.OnnxTensor
+import java.nio.FloatBuffer
 
 
 class OnnxEngine(
@@ -38,10 +36,9 @@ class OnnxEngine(
 
 
             val session =
-                environment
-                    .createSession(
-                        modelBytes
-                    )
+                environment.createSession(
+                    modelBytes
+                )
 
 
             sessions[name] =
@@ -69,22 +66,45 @@ class OnnxEngine(
         return sessions.containsKey(name)
 
     }
+
+
+
     fun run(
-        name: String,
-        input: OnnxTensor
+        modelName: String,
+        input: FloatBuffer,
+        width: Int,
+        height: Int
     ): OrtSession.Result {
 
 
         val session =
-            sessions[name]
-                ?: throw IllegalStateException(
-                    "Model not loaded: $name"
+            sessions[modelName]
+                ?: throw Exception(
+                    "Model not loaded"
                 )
+
+
+        val shape =
+            longArrayOf(
+                1,
+                3,
+                height.toLong(),
+                width.toLong()
+            )
+
+
+        val tensor =
+            OnnxTensor.createTensor(
+                environment,
+                input,
+                shape
+            )
 
 
         val inputs =
             mapOf(
-                session.inputNames.first() to input
+                session.inputNames.first()
+                        to tensor
             )
 
 
