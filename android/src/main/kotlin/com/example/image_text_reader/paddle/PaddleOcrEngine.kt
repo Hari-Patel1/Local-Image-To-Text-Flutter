@@ -34,14 +34,15 @@ class PaddleOcrEngine(
             )
 
 
-        detector.detect(
-            tensor
-        )
+        val boxes =
+            detector.detect(
+                tensor
+            )
 
 
         return OcrResult(
-            text = "Detection completed",
-            confidence = 1.0f
+            text = "Detected boxes: ${boxes.size}",
+            confidence = boxes.firstOrNull()?.confidence ?: 0f
         )
 
     }
