@@ -5,6 +5,7 @@ import com.example.image_text_reader.models.ImageInput
 import com.example.image_text_reader.processing.ImageProcessor
 import com.example.image_text_reader.ml.OnnxEngine
 import com.example.image_text_reader.paddle.PaddleOcrEngine
+import com.example.image_text_reader.ml.ModelManager
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -22,21 +23,46 @@ class ImageTextReaderPlugin :
     // when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
 
-    private val onnxEngine =
-        OnnxEngine()
+    private lateinit var onnxEngine: OnnxEngine
 
-    private val ocrEngine =
-        PaddleOcrEngine(
-            onnxEngine
-        )
+    private lateinit var ocrEngine: PaddleOcrEngine
 
     private val imageProcessor =
         ImageProcessor()
+
+    private lateinit var modelManager: ModelManager
 
 
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "image_text_reader")
+        onnxEngine =
+            OnnxEngine(
+                flutterPluginBinding.applicationContext
+            )
+        modelManager =
+            ModelManager(
+                flutterPluginBinding.applicationContext
+            )
+
+
+        onnxEngine.loadModel(
+            "detector",
+            "models/det.onnx"
+        )
+
+
+        onnxEngine.loadModel(
+            "recogniser",
+            "models/rec.onnx"
+        )
+
+        ocrEngine =
+            PaddleOcrEngine(
+                onnxEngine
+            )
+
+
         channel.setMethodCallHandler(this)
     }
 
@@ -49,14 +75,11 @@ class ImageTextReaderPlugin :
 
             "extractText" -> {
 
-
                 val imagePath =
-                    call.argument<String>(
-                        "imagePath"
-                    )
+                    call.argument<String>("imagePath")
 
 
-                if(imagePath == null){
+                if (imagePath == null) {
 
                     result.error(
                         "INVALID_IMAGE",
@@ -81,28 +104,19 @@ class ImageTextReaderPlugin :
                     )
 
 
-                val onnxReady =
-                    onnxEngine.initialise()
-
-
-                val text =
-                    if(onnxReady){
-
-                        "ONNX Runtime ready"
-
-                    } else {
-
-                        "ONNX Runtime failed"
-
-                    }
+                val ocrResult =
+                    ocrEngine.extractText(
+                        processedImage
+                    )
 
 
                 result.success(
                     mapOf(
-                        "text" to text,
-                        "confidence" to 1.0
+                        "text" to ocrResult.text,
+                        "confidence" to ocrResult.confidence
                     )
                 )
+
             }
 
 

@@ -2,32 +2,41 @@ package com.example.image_text_reader.paddle
 
 
 import com.example.image_text_reader.ml.OnnxEngine
-import com.example.image_text_reader.models.ImageInput
-import com.example.image_text_reader.ocr.OcrEngine
-
+import com.example.image_text_reader.processing.ProcessedImage
 
 class PaddleOcrEngine(
     private val onnxEngine: OnnxEngine
-) : OcrEngine {
+) {
 
 
-    override fun extractText(
-        image: ImageInput
-    ): String {
+    fun extractText(
+        image: ProcessedImage
+    ): OcrResult {
+
+        /*
+            Step 1:
+            Run detection model
+
+            TODO
 
 
-        return """
-        PaddleOCR Engine
+            Step 2:
+            Run recognition model
 
-        Image:
-        ${image.path}
+            TODO
 
-        ONNX backend:
-        Active
 
-        Model:
-        Not loaded yet
-        """.trimIndent()
+            Step 3:
+            Decode text
+
+            TODO
+        */
+
+
+        return OcrResult(
+            text = "OCR pipeline connected",
+            confidence = 1.0f
+        )
 
     }
 
