@@ -5,6 +5,8 @@ import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.content.Context
 
+import ai.onnxruntime.OnnxTensor
+
 
 class OnnxEngine(
     private val context: Context
@@ -67,6 +69,29 @@ class OnnxEngine(
         return sessions.containsKey(name)
 
     }
+    fun run(
+        name: String,
+        input: OnnxTensor
+    ): OrtSession.Result {
 
+
+        val session =
+            sessions[name]
+                ?: throw IllegalStateException(
+                    "Model not loaded: $name"
+                )
+
+
+        val inputs =
+            mapOf(
+                session.inputNames.first() to input
+            )
+
+
+        return session.run(
+            inputs
+        )
+
+    }
 
 }
