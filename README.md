@@ -25,7 +25,7 @@ Extract text from images entirely on-device with no internet connection required
 
 ```yaml
 dependencies:
-  flutter_local_ocr: ^1.0.0
+  image_text_reader: ^1.0.0
 ```
 
 ---
