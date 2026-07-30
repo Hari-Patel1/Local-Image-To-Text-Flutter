@@ -1,4 +1,5 @@
-# Flutter Local OCR
+# Image Text reader
+## Formerly known as Flutter Local Ocr
 
 A fast, fully offline OCR plugin for Flutter powered by PaddleOCR v5 and ONNX Runtime.
 
