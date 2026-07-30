@@ -52,7 +52,7 @@ print(result.text);
 File image = File(path);
 
 final result =
-    await FlutterLocalOcr.extractText(image.path);
+    await ImageTextReader.extractText(image.path);
 
 print(result.text);
 ```
