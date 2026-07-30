@@ -62,9 +62,8 @@ print(result.text);
 ## Output
 
 ```text
-2 eggs
-300g flour
-250ml milk
+The quick brown fox
+Jumped over the lazy dog
 ```
 
 ---
