@@ -111,7 +111,8 @@ Performance varies by device.
 
 ## Contributing
 
-Pull requests and feature suggestions are welcome.
+Pull requests and feature suggestions are welcome :).
+Edit and use in good health and most importantly: Have fun with it!
 
 ---
 
