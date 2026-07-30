@@ -24,7 +24,9 @@ class PaddleRecognizer(
             .readLines()
             .toMutableList()
             .apply {
-                add("")
+                if (lastOrNull() != " ") {
+                    add(" ")
+                }
                 add(0, "blank")
             }
 

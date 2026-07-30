@@ -56,7 +56,7 @@ class DbPostProcessor {
         for(i in 0 until limit){
 
             val value =
-                if(output[i] > 0.15f)
+                if(output[i] > 0.3f)
                     255
                 else
                     0

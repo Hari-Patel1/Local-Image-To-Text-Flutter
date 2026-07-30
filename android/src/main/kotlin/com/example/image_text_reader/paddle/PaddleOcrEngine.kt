@@ -50,13 +50,12 @@ class PaddleOcrEngine(
                 image.bitmap
             )
 
-
         val boxes =
             detector.detect(
                 tensor,
                 image.bitmap.width,
                 image.bitmap.height
-            )
+            ).sortedWith(compareBy({ it.top }, { it.left }))
 
 
         val duration =
@@ -97,8 +96,10 @@ class PaddleOcrEngine(
         println("OCR PIPELINE COMPLETE")
 
         return OcrResult(
-            text = "ANDROID OCR SUCCESS",
-            confidence = 1.0f
+            text = recognisedText.joinToString("\n"),
+            confidence = if (regions.isNotEmpty())
+                regions.map { it.confidence }.average().toFloat()
+            else 0f
         )
 
     }

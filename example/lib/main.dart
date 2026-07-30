@@ -83,38 +83,62 @@
       return Scaffold(
         appBar: AppBar(title: const Text("Image Text Reader Test")),
 
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-            children: [
+                if (selectedImage != null)
+                  Image.file(
+                    selectedImage!,
+                    width: 200,
+                    height: 200,
+                  ),
 
-              if(selectedImage != null)
+                const SizedBox(height: 20),
 
-                Image.file(
-                  selectedImage!,
-                  width:200,
-                  height:200,
+                Container(
+                  width: double.infinity,
+                  constraints: const BoxConstraints(
+                    maxHeight: 300,
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+
+                  child: SingleChildScrollView(
+                    child: Text(
+                      output,
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
 
-              Text(output),
+                const SizedBox(height: 20),
 
-              ElevatedButton(
-
-                onPressed: pickImage,
-
-                child: const Text(
-                    "Choose Image"
+                ElevatedButton(
+                  onPressed: pickImage,
+                  child: const Text(
+                    "Choose Image",
+                  ),
                 ),
 
-              ),
-
-              ElevatedButton(
-                onPressed: testPlugin,
-
-                child: const Text("Test Plugin"),
-              ),
-            ],
+                ElevatedButton(
+                  onPressed: testPlugin,
+                  child: const Text(
+                    "Test Plugin",
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
