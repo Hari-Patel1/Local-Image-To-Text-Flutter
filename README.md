@@ -11,6 +11,8 @@ Extract text from images entirely on-device with no internet connection required
 - Fully offline
 - Native Android implementation
 - Powered by PaddleOCR v5
+    - Detection OCRv6
+    - Recognition OCRv5
 - ONNX Runtime inference
 - Fast image processing
 - No cloud APIs
