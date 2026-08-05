@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0
+
+- Upgraded to Paddle OCR v6 model (small model size)
+  - Better detection
+  - Faster processing
+  - More accurate results
+  - Better for writtern documents
+- Fix: Updated OpenCV dependency
+- Fix: Updated PaddleOCR dependency
+- Fix: Updated ONNX Runtime dependency
+- Fix: Updated Flutter/Kotlin KGP syntax
+
 ## 1.1.1
 
 - Fix: General cleanup and formatting

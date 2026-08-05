@@ -8,10 +8,28 @@ import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 import android.graphics.Color
 import org.opencv.android.OpenCVLoader
-
+import kotlin.math.max
+import kotlin.math.min
 
 
 class DbPostProcessor {
+
+    // How much to expand each detected box outward, as a fraction of its
+    // own size. The DB probability map is trained on a *shrunk* version of
+    // the real text region, so boxes taken straight from contours are
+    // consistently tighter than the actual text -- this compensates for
+    // that and helps stop characters (especially ascenders/descenders and
+    // the first/last letter of a line) getting clipped.
+    private val unclipRatio = 1.6f
+
+    // Minimum contour area to keep -- filters out speckle/noise contours.
+    private val minArea = 20.0
+
+    // Minimum mean probability (0..1) inside a box's own contour to keep it.
+    // Distinct from the binarization threshold used to build the mask --
+    // this is a second, independent quality gate on top of that.
+    private val minConfidence = 0.5f
+
     init {
         if (!OpenCVLoader.initDebug()) {
             println("OpenCV FAILED TO LOAD")
@@ -21,8 +39,7 @@ class DbPostProcessor {
     }
 
 
-
-        fun process(
+    fun process(
         output: FloatArray,
         width: Int,
         height: Int
@@ -121,7 +138,7 @@ class DbPostProcessor {
 
 
             // ignore tiny noise
-            if(area < 20)
+            if(area < minArea)
                 continue
 
 
@@ -132,19 +149,45 @@ class DbPostProcessor {
                 )
 
 
+            // Mean raw probability from the detector's output map, inside
+            // this box's original (pre-unclip) bounds. This is the actual
+            // confidence signal -- area alone says nothing about how sure
+            // the model was.
+            val confidence =
+                meanProbability(
+                    output,
+                    width,
+                    height,
+                    rect
+                )
+
+
+            if(confidence < minConfidence)
+                continue
+
+
+            val expanded =
+                unclip(
+                    rect,
+                    unclipRatio,
+                    width,
+                    height
+                )
+
+
             boxes.add(
 
                 TextBox(
 
-                    rect.x.toFloat(),
+                    expanded.x.toFloat(),
 
-                    rect.y.toFloat(),
+                    expanded.y.toFloat(),
 
-                    (rect.x + rect.width).toFloat(),
+                    (expanded.x + expanded.width).toFloat(),
 
-                    (rect.y + rect.height).toFloat(),
+                    (expanded.y + expanded.height).toFloat(),
 
-                    area.toFloat()
+                    confidence
 
                 )
 
@@ -159,6 +202,83 @@ class DbPostProcessor {
 
 
         return boxes
+
+    }
+
+
+    /**
+     * Expands a rect outward by [ratio] (fraction of its own width/height
+     * added as margin on each side), clamped to stay within the map bounds.
+     */
+    private fun unclip(
+        rect: Rect,
+        ratio: Float,
+        mapWidth: Int,
+        mapHeight: Int
+    ): Rect {
+
+        val marginX =
+            (rect.width * (ratio - 1f) / 2f)
+                .toInt()
+
+        val marginY =
+            (rect.height * (ratio - 1f) / 2f)
+                .toInt()
+
+        val left =
+            max(0, rect.x - marginX)
+
+        val top =
+            max(0, rect.y - marginY)
+
+        val right =
+            min(mapWidth, rect.x + rect.width + marginX)
+
+        val bottom =
+            min(mapHeight, rect.y + rect.height + marginY)
+
+        return Rect(
+            left,
+            top,
+            right - left,
+            bottom - top
+        )
+
+    }
+
+
+    /**
+     * Average raw detector probability across the pixels inside [rect].
+     * Used as a confidence score, independent of contour area.
+     */
+    private fun meanProbability(
+        output: FloatArray,
+        width: Int,
+        height: Int,
+        rect: Rect
+    ): Float {
+
+        var sum = 0f
+        var count = 0
+
+        val startY = rect.y.coerceIn(0, height - 1)
+        val endY = (rect.y + rect.height).coerceIn(0, height)
+
+        val startX = rect.x.coerceIn(0, width - 1)
+        val endX = (rect.x + rect.width).coerceIn(0, width)
+
+        for (y in startY until endY) {
+            val rowOffset = y * width
+            for (x in startX until endX) {
+                val index = rowOffset + x
+                if (index < output.size) {
+                    sum += output[index]
+                    count++
+                }
+            }
+        }
+
+        return if (count > 0) sum / count else 0f
 
     }
 
