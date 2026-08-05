@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Fix: Flutter/Kotlin KGP syntax fixed for version compatibility
+
 ## 1.0.1
 
 - Fix: OCR crop saving and improve recognition
