@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Fix: OCR crop saving and improve recognition
+
 ## 1.0.0
 
 Initial release of Image Text Reader.
