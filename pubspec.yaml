@@ -1,11 +1,11 @@
 name: image_text_reader
 description: Offline OCR plugin for Flutter using PaddleOCR v5 and ONNX Runtime. Supports on-device text detection and recognition with no internet connection.
 version: 1.0.1
-homepage: https://github.com/Hari-Patel1/image_text_reader
+homepage: https://github.com/Hari-Patel1/Local-Image-To-Text-Flutter
 
-repository: https://github.com/Hari-Patel1/image_text_reader
+repository: https://github.com/Hari-Patel1/Local-Image-To-Text-Flutter
 
-issue_tracker: https://github.com/Hari-Patel1/image_text_reader/issues
+issue_tracker: https://github.com/Hari-Patel1/Local-Image-To-Text-Flutter/issues
 
 environment:
   sdk: ^3.12.2
