@@ -55,29 +55,6 @@ class PaddleRecognizer(
         )
 
 
-        val file = File(
-            Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES
-            ),
-            "ocr_crop.png"
-        )
-
-        val output =
-            java.io.FileOutputStream(file)
-
-        region.bitmap.compress(
-            android.graphics.Bitmap.CompressFormat.PNG,
-            100,
-            output
-        )
-
-        output.close()
-
-        println(
-            "SAVED CROP: ${file.absolutePath}"
-        )
-
-
 
         val resized =
             processor.resize(
