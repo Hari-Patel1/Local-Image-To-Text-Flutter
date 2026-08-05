@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fix: General cleanup and formatting
+
 ## 1.1.0
 
 - Fix: Flutter/Kotlin KGP syntax fixed for version compatibility
