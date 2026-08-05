@@ -1,12 +1,12 @@
 group = "com.example.image_text_reader"
 version = "1.0-SNAPSHOT"
 
-buildscript {
-    val kotlinVersion = "2.3.20"
-    repositories {
-        google()
-        mavenCentral()
-    }
+//buildscript {
+//    val kotlinVersion = "2.3.20"
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
 
     dependencies {
         classpath("com.android.tools.build:gradle:9.0.1")
