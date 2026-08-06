@@ -1,12 +1,9 @@
 package com.example.image_text_reader
 
-import com.example.image_text_reader.ocr.SimpleOcrEngine
-import com.example.image_text_reader.models.ImageInput
-import com.example.image_text_reader.processing.ImageProcessor
 import com.example.image_text_reader.ml.OnnxEngine
+import com.example.image_text_reader.models.ImageInput
 import com.example.image_text_reader.paddle.PaddleOcrEngine
-import com.example.image_text_reader.ml.ModelManager
-import ai.onnxruntime.OrtEnvironment
+import com.example.image_text_reader.processing.ImageProcessor
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -14,14 +11,22 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
-/** ImageTextReaderPlugin */
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 class ImageTextReaderPlugin :
     FlutterPlugin,
     MethodCallHandler {
-    // The MethodChannel that will the communication between Flutter and native Android
-    //
-    // This local reference serves to register the plugin with the Flutter Engine and unregister it
-    // when the Flutter Engine is detached from the Activity
+
+    private val pluginScope =
+        CoroutineScope(
+            Dispatchers.Main + SupervisorJob()
+        )
+
     private lateinit var channel: MethodChannel
 
     private lateinit var onnxEngine: OnnxEngine
@@ -31,30 +36,24 @@ class ImageTextReaderPlugin :
     private val imageProcessor =
         ImageProcessor()
 
-    private lateinit var modelManager: ModelManager
+    override fun onAttachedToEngine(
+        binding: FlutterPlugin.FlutterPluginBinding
+    ) {
 
+        channel = MethodChannel(
+            binding.binaryMessenger,
+            "image_text_reader"
+        )
 
-
-
-    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "image_text_reader")
         onnxEngine =
             OnnxEngine(
-                flutterPluginBinding.applicationContext
+                binding.applicationContext
             )
-        modelManager =
-            ModelManager(
-                flutterPluginBinding.applicationContext
-            )
-
-
-
 
         onnxEngine.loadModel(
             "detector",
             "models/det.onnx"
         )
-
 
         onnxEngine.loadModel(
             "recogniser",
@@ -63,10 +62,9 @@ class ImageTextReaderPlugin :
 
         ocrEngine =
             PaddleOcrEngine(
-                flutterPluginBinding.applicationContext,
+                binding.applicationContext,
                 onnxEngine
             )
-
 
         channel.setMethodCallHandler(this)
     }
@@ -76,13 +74,12 @@ class ImageTextReaderPlugin :
         result: Result
     ) {
 
-        when(call.method) {
+        when (call.method) {
 
             "extractText" -> {
 
                 val imagePath =
                     call.argument<String>("imagePath")
-
 
                 if (imagePath == null) {
 
@@ -93,41 +90,53 @@ class ImageTextReaderPlugin :
                     )
 
                     return
+                }
+
+                pluginScope.launch {
+
+                    try {
+
+                        val ocrResult =
+                            withContext(Dispatchers.IO) {
+
+                                val image =
+                                    ImageInput(imagePath)
+
+                                val processedImage =
+                                    imageProcessor.process(
+                                        image
+                                    )
+
+                                ocrEngine.extractText(
+                                    processedImage
+                                )
+
+                            }
+
+                        println("SENDING RESULT TO FLUTTER")
+
+                        result.success(
+                            mapOf(
+                                "text" to ocrResult.text,
+                                "confidence" to ocrResult.confidence
+                            )
+                        )
+
+                    } catch (e: Exception) {
+
+                        e.printStackTrace()
+
+                        result.error(
+                            "OCR_FAILED",
+                            e.stackTraceToString(),
+                            null
+                        )
+
+                    }
 
                 }
 
-
-                val image =
-                    ImageInput(
-                        imagePath
-                    )
-
-
-                val processedImage =
-                    imageProcessor.process(
-                        image
-                    )
-
-
-
-
-                val ocrResult =
-                    ocrEngine.extractText(
-                        processedImage
-                    )
-
-
-                println("SENDING RESULT TO FLUTTER")
-
-                result.success(
-                    mapOf(
-                        "text" to ocrResult.text,
-                        "confidence" to ocrResult.confidence
-                    )
-                )
-
             }
-
 
             "getPlatformVersion" -> {
 
@@ -136,7 +145,6 @@ class ImageTextReaderPlugin :
                 )
 
             }
-
 
             else -> {
 
@@ -148,7 +156,19 @@ class ImageTextReaderPlugin :
 
     }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(
+        binding: FlutterPlugin.FlutterPluginBinding
+    ) {
+
         channel.setMethodCallHandler(null)
+
+        pluginScope.cancel()
+
+        // If your OnnxEngine has a cleanup method,
+        // call it here:
+        //
+        // onnxEngine.close()
+
     }
+
 }

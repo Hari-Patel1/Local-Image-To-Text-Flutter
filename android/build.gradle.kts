@@ -1,18 +1,18 @@
 group = "com.example.image_text_reader"
 version = "1.0-SNAPSHOT"
 
-////buildscript {
-////    val kotlinVersion = "2.3.20"
-////    repositories {
-////        google()
-////        mavenCentral()
-////    }
-//
-//    dependencies {
-//        classpath("com.android.tools.build:gradle:9.0.1")
-//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-//    }
-//}
+    ////buildscript {
+    ////    val kotlinVersion = "2.3.20"
+    ////    repositories {
+    ////        google()
+    ////        mavenCentral()
+    ////    }
+    //
+    //    dependencies {
+    //        classpath("com.android.tools.build:gradle:9.0.1")
+    //        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    //    }
+    //}
 
 allprojects {
     repositories {
@@ -76,5 +76,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.0.0")
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.27.0")
     implementation("org.opencv:opencv:4.10.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
 }

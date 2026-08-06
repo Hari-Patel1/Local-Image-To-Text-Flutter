@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0
+
+- Implemented Kotlin Coroutines
+
 ## 2.0.0
 
 - Upgraded to Paddle OCR v6 model (small model size)
